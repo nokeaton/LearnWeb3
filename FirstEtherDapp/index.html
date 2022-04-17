@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FirstEtherJSDapp</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: "Helvetica Neue",Helvetica,Arial;
+        }
+
+        div {
+            width: 20%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        button {
+            width: 100%;
+            margin: 10px 0px 5px 0px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>First front-end intergrated dApp!</h1>
+        <p>Let's set the level of motivation for this developer journey</p>
+        <label for="motivation">Input Motivation Level:</label>
+        <input type="text" id="motivation">
+        <button onclick="readMotivationLevel()">Get Motivation Level</button>
+    <button onclick="setMotivationLevel()">Set Motivation Level</button>
+    </div>
+</body>
+<script>
+    src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+    type="application/javascript"
+</script>
+<script>
+    const MotivationContractAddress = "0x08F4bFb26f03A088B45b5286A475Bb1eF738349f"
+    const MotivationContractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_motivationLevel",
+				"type": "string"
+			}
+		],
+		"name": "setMotivationLevel",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "readMotivationLevel",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+    let MotivationDiary;
+    let signer;
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "ropsten");
+    provider.send("eth_requestAccounts", []).then(() => {
+            provider.listAccounts().then((accounts) => {
+            signer = provider.getSigner(accounts[0]);
+            MotivationDiary = new ethers.Contract(
+            MotivationContractAddress,
+            MotivationContractABI,
+            signer
+            );
+        });
+    });
+
+    async function readMotivationLevel() {
+        const readMotivationPromise = MotivationDiary.readMotivationLevel();
+        const MotivationLevel = await readMotivationPromise;
+        console.log(MotivationLevel);
+    }
+
+    async function setMotivationLevel() {
+        const motivation = document.getElementById("motivation").value;
+        const setMotivationLevel = MotivationDiary.setMotivationLevel(motivation);
+        await setMotivationLevel;
+    }
+
+</script>
+</html>
